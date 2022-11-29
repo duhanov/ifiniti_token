@@ -19,6 +19,9 @@ contract Crowdfund is Context {
    // End funding time
     uint private _endTime;
 
+    uint private _endConfirmTime;
+    uint private _cancelTime;
+
    // Min keys for buy
     uint256 private _minBuyKeys;
 
@@ -27,6 +30,8 @@ contract Crowdfund is Context {
 
     // Need Amount for end
     uint256 private _needAmount;
+
+    uint256 private _amount=0;
 
     //Price by one keys
     uint256 private _keyPrice;
@@ -37,9 +42,11 @@ contract Crowdfund is Context {
     //Count Open Keys
     uint256 private _countOpenKeys = 0;
 
+    //Confirm of end of crowdfund
+    bool private _ended = false;
 
-
-
+    //crowdfund cancel?
+    bool _canceled = false;
 
     /*
     ORDERS
@@ -70,6 +77,10 @@ contract Crowdfund is Context {
         return _keys.length;
     }
 
+    function _getAmount() internal view returns (uint256){
+        return _amount;
+    }
+
     //Push key
     function _pushKey(string memory key) internal{
         _keys.push(key);
@@ -85,9 +96,52 @@ contract Crowdfund is Context {
         return _endTime;
     }
 
-    //check end time
-    function _ended() internal view returns(bool){
+    
+    //Ended
+    function _getEnded() internal view returns(bool){
+        return _ended;
+    }
+
+    //check time end
+    function _timeEnded() internal view returns(bool){
         return (block.timestamp >= _endTime);
+    }
+
+    //Back tokens and cancel orders
+    function _cancelAll() internal{
+        require(!_canceled, "Already canceled.");
+        require(!_ended, "Crowdfund ended.");
+        require(_timeEnded(), "Time not ended");
+
+        //return orders
+        IERC20 token = IERC20(address(_erc20Token));        
+        for(uint256 orderId=0; orderId < _countOrders; orderId++){
+            token.transfer(_orderOwners[orderId], _orderAmounts[orderId]);
+        }
+
+        //save is canceled
+        _canceled = true;
+        _cancelTime = block.timestamp;
+
+    }
+
+    function _getCanceled() internal view returns(bool){
+        return _canceled;
+    }
+
+    //confirm end
+    function _endConfirm() internal  {
+        //check canceled
+        require(!_canceled, "Crowdfund canceled");
+        //check Amount
+        require(_amountComplete(), "Amount not complete");
+        //check end time
+        require(_timeEnded(), "Time not ended");
+        //check count keys in system
+        require(_getCountKeys() >= _needCountKeys(), "Need more keys for end");
+        
+        _ended = true;    
+        _endConfirmTime = block.timestamp;
     }
 
     //return count open keys
@@ -99,8 +153,8 @@ contract Crowdfund is Context {
     function _openOrder(uint256 orderId) internal{
         //exist order
         require(_orderExists(orderId), "Order not exist");
-        //check end time
-        require(!_ended(), "Crowdfund not ended");
+        //check ended
+        require(_ended, "Crowdfund not confirm end");
         //check owner order
         require(_ownerOfOrder(orderId) == _msgSender(), "Invalid owner");
         if(_orderOpens[orderId] == false){
@@ -139,14 +193,29 @@ contract Crowdfund is Context {
         return _keys[_orderStartKeyIndexes[orderId] + keyNumber];
     }
 
+    function _amountComplete() internal view returns(bool){
+        return _amount >= _needAmount;
+    }
+    
      //order keypack
     function _order(uint256 countKeys) internal returns(uint256) {
+        //check cancel
+        require(!_canceled, "Crowdfund was canceled");
+        //check amount
+        require(!_amountComplete(), "Amount complete");
+        //Check end
+        require(!_ended, "Crowdfund ended");
+        //check cancel
+        require(!_canceled, "Crowdfund was canceled");
         //Check endTime
-        require(!_ended());
+        require(!_timeEnded(), "Time ended");
+        
+
         //Min/Max count keys
         require(countKeys >= _minBuyKeys && countKeys <= _maxBuyKeys, "invalid countKeys");
         //transfer and check
         IERC20 token = IERC20(address(_erc20Token));  
+        //get price for countKeys keys
         uint256 orderAmount = _getKeypackPrice(countKeys);
         //Require transfer tokens
         require(token.transferFrom(_msgSender(), address(this), orderAmount), "Cant transfer tokens");

@@ -58,11 +58,28 @@ contract IfinitiCrowdfund is Ownable, Crowdfund {
     function checkCountKeys() public view onlyOwner returns(bool) {
         return _checkCountKeys();
     }
+    
+    //Cancel Crowdfund
+    function cancelAll() public onlyOwner {
+        _cancelAll();
+    }
+
+    //confirm end crowdfund
+    function endConfirm() public onlyOwner {
+        return _endConfirm();
+    }
 
     //crowfund ended?
     function ended() public view returns(bool){
         return _ended();
     }
+
+    //crowfund canceled?
+    function canceled() public view returns(bool){
+        return _getCanceled();
+    }
+
+    
 
     //get  count keys in order
     function getOrderCountKeys(uint256 orderId) public view returns(uint256){
