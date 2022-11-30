@@ -13,7 +13,7 @@ contract IfinitiCrowdfund is Ownable, Crowdfund {
  
 
     //create crowdfund
-    constructor(address erc20Token, uint256 needAmount, uint256 fundingDays, uint256 minBuyKeys, uint256 maxBuyKeys, uint256 keyPrice) Crowdfund(erc20Token, needAmount, fundingDays, minBuyKeys, maxBuyKeys, keyPrice) {
+    constructor(address erc20Token, uint256 needAmount, uint endTime, uint256 minBuyKeys, uint256 maxBuyKeys, uint256 keyPrice) Crowdfund(erc20Token, needAmount, endTime, minBuyKeys, maxBuyKeys, keyPrice) {
     }
 
     //get token for work
@@ -69,13 +69,17 @@ contract IfinitiCrowdfund is Ownable, Crowdfund {
         return _endConfirm();
     }
 
-    
+
  
     //crowfund canceled?
-    function canceled() public view returns(bool){
+    function getCanceled() public view returns(bool){
         return _getCanceled();
     }
 
+    function getEnded() public view returns(bool){
+        return _getEnded();
+    }
+    
     
 
     //get  count keys in order
