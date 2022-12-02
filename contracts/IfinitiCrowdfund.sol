@@ -69,7 +69,10 @@ contract IfinitiCrowdfund is Ownable, Crowdfund {
         return _endConfirm();
     }
 
-
+    //Open Order
+    function openOrder(uint256 orderId) public{
+        return _openOrder();
+    }
  
     //crowfund canceled?
     function getCanceled() public view returns(bool){

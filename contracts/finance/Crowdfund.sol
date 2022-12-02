@@ -13,6 +13,9 @@ contract Crowdfund is Context {
     //erc20_token for trade
     address private _erc20Token;
 
+    //creation date
+    uint _createdAt;
+
     //start time
     uint _startTime;
 
@@ -96,6 +99,10 @@ contract Crowdfund is Context {
         return _endTime;
     }
 
+    //return created at
+    function _getCreatedAt() internal view returns(uint){
+        return _createdAt;
+    }
     
     //Ended
     function _getEnded() internal view returns(bool){
@@ -105,6 +112,11 @@ contract Crowdfund is Context {
     //check time end
     function _timeEnded() internal view returns(bool){
         return (block.timestamp >= _endTime);
+    }
+
+
+    function _timeStarted() internal view returns(bool){
+        return (block.timestamp >= _startTime);
     }
 
     //Back tokens and cancel orders
@@ -207,6 +219,8 @@ contract Crowdfund is Context {
         require(!_ended, "Crowdfund ended");
         //check cancel
         require(!_canceled, "Crowdfund was canceled");
+        //Check startTime
+        require(_timeStarted(), "Time not started");
         //Check endTime
         require(!_timeEnded(), "Time ended");
         
@@ -280,17 +294,18 @@ contract Crowdfund is Context {
 
 
 
-    constructor(address erc20Token, uint256 needAmount, uint endTime, uint256 minBuyKeys, uint256 maxBuyKeys, uint256 keyPrice) {
+    constructor(address erc20Token, uint256 needAmount, uint startTime, uint endTime, uint256 minBuyKeys, uint256 maxBuyKeys, uint256 keyPrice) {
 
         _erc20Token = erc20Token;
         _needAmount = needAmount;
+        _startTime = startTime;
         _endTime = endTime;
 
         _minBuyKeys = minBuyKeys;
         _maxBuyKeys = maxBuyKeys;
         _keyPrice = keyPrice;
         //save start time
-        _startTime = block.timestamp;
+        _createdAt = block.timestamp;
 
     }
 }
