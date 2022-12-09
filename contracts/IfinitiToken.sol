@@ -7,7 +7,7 @@ import "./token/ERC20/ERC20.sol";
 import "./access/Ownable.sol";
 
 contract IfinitiToken is ERC20, Ownable {
-    constructor() ERC20("IfinitiToken", "IFT") {
+    constructor() ERC20("IfinitiToken", "IFG") {
         _mint(msg.sender, 280000000 * 10 ** decimals());
     }
 
