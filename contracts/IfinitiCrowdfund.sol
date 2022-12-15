@@ -13,8 +13,9 @@ contract IfinitiCrowdfund is Ownable, Crowdfund {
  
 
     //create crowdfund
-    constructor(address erc20Token, uint256 needAmount, uint startTime, uint endTime, uint256 minBuyKeys, uint256 maxBuyKeys, uint256 keyPrice) Crowdfund(erc20Token, needAmount, startTime, endTime, minBuyKeys, maxBuyKeys, keyPrice) {
+    constructor(address erc20Token, uint256 minAmount, uint256 maxAmount, uint startTime, uint endTime, uint payoutStartTime, uint payoutEndTime) Crowdfund(erc20Token, minAmount, maxAmount, startTime, endTime, payoutStartTime, payoutEndTime) {
     }
+
 
     //get token for work
     function getErc20Token() public view returns(address){
@@ -45,19 +46,12 @@ contract IfinitiCrowdfund is Ownable, Crowdfund {
     }
 
     //order
-    function order(uint256 countKeys) public returns(uint256) {
-        return _order(countKeys);
+    function order(uint256 assetId, uint256 countAssets) public returns(uint256) {
+        return _order(assetId, countAssets);
     }
 
-    //get count keys in contract for complete
-    function needCountKeys() public view onlyOwner returns(uint256) {
-        return _needCountKeys();
-    }
 
-    //get count keys in contract for complete
-    function checkCountKeys() public view onlyOwner returns(bool) {
-        return _checkCountKeys();
-    }
+
 
     //Cancel Crowdfund
     function cancelAll() public onlyOwner {
@@ -82,12 +76,17 @@ contract IfinitiCrowdfund is Ownable, Crowdfund {
     function getEnded() public view returns(bool){
         return _getEnded();
     }
+
+
+    function addAsset(string memory name, uint256 minBuy, uint256 maxBuy, uint256 buyPrice, uint256 sellPrice, uint startTime, uint endTime, uint payoutStartTime, uint payoutEndTime) internal returns (uint256){
+        return _addAsset(name, minBuy, maxBuy, buyPrice, sellPrice, startTime, endTime, payoutStartTime, payoutEndTime);
+    }
     
     
 
     //get  count keys in order
-    function getOrderCountKeys(uint256 orderId) public view returns(uint256){
-        return _getOrderCountKeys(orderId);
+    function getOrderCountAssets(uint256 orderId) public view returns(uint256){
+        return _getOrderCountAssets(orderId);
     }
 
     //get  count keys in order

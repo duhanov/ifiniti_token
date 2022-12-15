@@ -22,6 +22,10 @@ contract Crowdfund is Context {
    // End funding time
     uint private _endTime;
 
+    //Payouts Times
+    uint private _payoutStartTime;
+    uint private _payoutEndTime;
+
     uint private _endConfirmTime;
     uint private _cancelTime;
 
@@ -32,7 +36,8 @@ contract Crowdfund is Context {
     uint256 private _maxBuyKeys;
 
     // Need Amount for end
-    uint256 private _needAmount;
+    uint256 private _minAmount;
+    uint256 private _maxAmount;
 
     uint256 private _amount=0;
 
@@ -43,7 +48,7 @@ contract Crowdfund is Context {
     string[] private _keys;
 
     //Count Open Keys
-    uint256 private _countOpenKeys = 0;
+//    uint256 private _countOpenKeys = 0;
 
     //Confirm of end of crowdfund
     bool private _ended = false;
@@ -63,8 +68,12 @@ contract Crowdfund is Context {
     //Order Amount
     mapping(uint256 => uint256) private _orderAmounts;
 
-    //CountKeys in order
-    mapping(uint256 => uint256) private _orderCountKeys;
+    //Order Assets
+    mapping(uint256 => uint256) private _orderAssets;
+
+
+    //Count assets in order
+    mapping(uint256 => uint256) private _orderCountAssets;
 
     //save order times
     mapping(uint256 => uint) private _orderTimes;
@@ -116,7 +125,14 @@ contract Crowdfund is Context {
 
 
     function _timeStarted() internal view returns(bool){
-        return (block.timestamp >= _startTime);
+        return (block.timestamp > _startTime);
+    }
+    function _assetTimeStarted(uint256 assetId) internal view returns(bool){
+        return (block.timestamp >= _assetStartTime[assetId]);
+    }
+
+    function _assetTimeEnded(uint256 assetId) internal view returns(bool){
+        return (block.timestamp > _assetEndTime[assetId]);
     }
 
     //Back tokens and cancel orders
@@ -150,16 +166,16 @@ contract Crowdfund is Context {
         //check end time
         require(_timeEnded(), "Time not ended");
         //check count keys in system
-        require(_getCountKeys() >= _needCountKeys(), "Need more keys for end");
+        //require(_getCountKeys() >= _needCountKeys(), "Need more keys for end");
         
         _ended = true;    
         _endConfirmTime = block.timestamp;
     }
 
     //return count open keys
-    function _getCountOpenKeys() internal view returns(uint256){
-        return _countOpenKeys;
-    }
+//    function _getCountOpenKeys() internal view returns(uint256){
+  //      return _countOpenKeys;
+    //}
 
     //open order and get keys
     function _openOrder(uint256 orderId) internal{
@@ -170,20 +186,20 @@ contract Crowdfund is Context {
         //check owner order
         require(_ownerOfOrder(orderId) == _msgSender(), "Invalid owner");
         if(_orderOpens[orderId] == false){
-            //save order is open
+  //          //save order is open
             _orderOpens[orderId] = true;
             //Save start key index for order
-            _orderStartKeyIndexes[orderId] = _countOpenKeys;
+      //      _orderStartKeyIndexes[orderId] = _countOpenKeys;
             //Update count open keys
-            _countOpenKeys = _countOpenKeys + _orderCountKeys[orderId];
+            //_countOpenKeys = _countOpenKeys + _orderCountKeys[orderId];
         }
     }
 
     //get order count keys
-    function _getOrderCountKeys(uint256 orderId) internal view returns(uint256){
+    function _getOrderCountAssets(uint256 orderId) internal view returns(uint256){
         //exist order
         require(_orderExists(orderId), "Order not exist");
-        return _orderCountKeys[orderId];
+        return _orderCountAssets[orderId];
     }
 
     //get order amount
@@ -194,23 +210,23 @@ contract Crowdfund is Context {
     }
 
     //Get open order key
-    function _getOrderKey(uint256 orderId, uint256 keyNumber) internal view returns(string memory){
+//    function _getOrderKey(uint256 orderId, uint256 keyNumber) internal view returns(string memory){
         //exist order
-        require(_orderExists(orderId), "Order not exist");
+  //      require(_orderExists(orderId), "Order not exist");
         //order opened
-        require(_orderOpens[orderId], "Order not opened");
-        //check keyNumber
-        require(keyNumber >= 0 && keyNumber < _orderCountKeys[orderId]);
+      //  require(_orderOpens[orderId], "Order not opened");
+    //    //check keyNumber
+        //require(keyNumber >= 0 && keyNumber < _orderCountKeys[orderId]);
 
-        return _keys[_orderStartKeyIndexes[orderId] + keyNumber];
-    }
+//        return _keys[_orderStartKeyIndexes[orderId] + keyNumber];
+  //  }
 
     function _amountComplete() internal view returns(bool){
-        return _amount >= _needAmount;
+        return _amount >= _minAmount;
     }
     
      //order keypack
-    function _order(uint256 countKeys) internal returns(uint256) {
+    function _order(uint256 assetId, uint256 countAssets) internal returns(uint256) {
         //check cancel
         require(!_canceled, "Crowdfund was canceled");
         //check amount
@@ -220,24 +236,31 @@ contract Crowdfund is Context {
         //check cancel
         require(!_canceled, "Crowdfund was canceled");
         //Check startTime
-        require(_timeStarted(), "Time not started");
+        require(!_timeStarted(), "Time not started");
         //Check endTime
-        require(!_timeEnded(), "Time ended");
-        
+        require(_timeEnded(), "Time ended!");
 
-        //Min/Max count keys
-        require(countKeys >= _minBuyKeys && countKeys <= _maxBuyKeys, "invalid countKeys");
+        //Check Asset
+        //Check Asset Found
+        require(!_assetExist[assetId], "Asset not found");
+        //check asset time
+        require(!_assetTimeStarted(assetId), "Asset time not started");
+        require(_assetTimeEnded(assetId), "Asset time ended!");    
+        //Min/Max count assets
+        require(countAssets < _assetMinBuy[assetId] || countAssets > _assetMaxBuy[assetId], "invalid countAssets");
+
         //transfer and check
         IERC20 token = IERC20(address(_erc20Token));  
         //get price for countKeys keys
-        uint256 orderAmount = _getKeypackPrice(countKeys);
+        uint256 orderAmount = _assetBuyPrice[assetId] * countAssets;
         //Require transfer tokens
         require(token.transferFrom(_msgSender(), address(this), orderAmount), "Cant transfer tokens");
 
         //save order info
         _orderOwners[_countOrders] = _msgSender();
         _orderAmounts[_countOrders] = orderAmount;
-        _orderCountKeys[_countOrders] = countKeys;
+        _orderCountAssets[_countOrders] = countAssets;
+        _orderAssets[_countOrders] = assetId;
         _orderTimes[_countOrders] = block.timestamp;
         _orderOpens[_countOrders] = false;
         //inrease counter
@@ -253,9 +276,9 @@ contract Crowdfund is Context {
 
 
     //get price of keypack
-    function _getKeypackPrice(uint256 countKeys) internal view returns (uint256){
-        return _keyPrice * countKeys;
-    }
+//    function _getKeypackPrice(uint256 countKeys) internal view returns (uint256){
+  //      return _keyPrice * countKeys;
+    //}
 
     //Get Min keys four buying
     function _getBuyMinKeys() internal view returns(uint256){
@@ -282,14 +305,14 @@ contract Crowdfund is Context {
     }
 
     //calculate count tokens for complete
-    function _needCountKeys() internal view returns (uint256){
-        return _needAmount / _keyPrice;
-    }
+    //function _needCountKeys() internal view returns (uint256){
+     //   return _needAmount / _keyPrice;
+   // }
     
     //check count keys for complete
-    function _checkCountKeys() internal view returns (bool){
-        return (_needCountKeys() <= _keys.length);
-    }
+   // function _checkCountKeys() internal view returns (bool){
+     //   return (_needCountKeys() <= _keys.length);
+   // }
 
     //withdraw ERC20 tokens
     function _withdraw(address to, uint256 amount) internal {
@@ -300,16 +323,52 @@ contract Crowdfund is Context {
     }
  
 
-    constructor(address erc20Token, uint256 needAmount, uint startTime, uint endTime, uint256 minBuyKeys, uint256 maxBuyKeys, uint256 keyPrice) {
+    //-- Assets
+    uint256 private _countAssets = 0;
+    mapping(uint256 => string) private _assetName;
+    mapping(uint256 => bool) private _assetExist;
+    mapping(uint256 => uint256) private _assetMinBuy;
+    mapping(uint256 => uint256) private _assetMaxBuy;
+    mapping(uint256 => uint256) private _assetBuyPrice;
+    mapping(uint256 => uint256) private _assetSellPrice;
+    mapping(uint256 => uint) private _assetStartTime;
+    mapping(uint256 => uint) private _assetEndTime;
+    mapping(uint256 => uint) private _assetPayoutStartTime;
+    mapping(uint256 => uint) private _assetPayoutEndTime;
+
+
+    //Add asset to contract
+    function _addAsset(string memory name, uint256 minBuy, uint256 maxBuy, uint256 buyPrice, uint256 sellPrice, uint startTime, uint endTime, uint payoutStartTime, uint payoutEndTime) internal returns (uint256){
+        _assetExist[_countAssets] = true;
+        _assetName[_countAssets] = name;
+        _assetMinBuy[_countAssets] = minBuy;
+        _assetMaxBuy[_countAssets] = maxBuy;
+        _assetBuyPrice[_countAssets] = buyPrice;
+        _assetSellPrice[_countAssets] = sellPrice;
+        _assetStartTime[_countAssets] = startTime;
+        _assetEndTime[_countAssets] = endTime;
+        _assetPayoutStartTime[_countAssets] = payoutStartTime;
+        _assetPayoutEndTime[_countAssets] = payoutEndTime;
+        _countAssets+=1;
+        return _countAssets-1;
+    }
+
+    function _removeAsset(uint256 assetId) internal{
+        _assetExist[assetId] = true;
+    }
+
+    constructor(address erc20Token, uint256 minAmount, uint256 maxAmount, uint startTime, uint endTime, uint payoutStartTime, uint payoutEndTime) {
 
         _erc20Token = erc20Token;
-        _needAmount = needAmount;
+        _minAmount = minAmount;
+        _maxAmount = maxAmount;
+
         _startTime = startTime;
         _endTime = endTime;
 
-        _minBuyKeys = minBuyKeys;
-        _maxBuyKeys = maxBuyKeys;
-        _keyPrice = keyPrice;
+        _payoutStartTime = payoutStartTime;
+        _payoutEndTime = payoutEndTime;
+
         //save start time
         _createdAt = block.timestamp;
 
