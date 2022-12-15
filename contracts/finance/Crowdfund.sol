@@ -353,7 +353,7 @@ contract Crowdfund is Context {
     }
 
     //Add asset to contract
-    function _addAsset(string memory name, uint256 amount, uint256 minBuy, uint256 maxBuy, uint256 buyPrice, uint256 sellPrice, uint startTime, uint endTime, uint payoutStartTime, uint payoutEndTime) internal {//returns (uint256){
+    function _addAsset(string memory name, uint256 amount, uint256 minBuy, uint256 maxBuy, uint256 buyPrice, uint256 sellPrice, uint startTime, uint endTime, uint payoutStartTime, uint payoutEndTime) internal returns (uint256){
         _assetExist[_countAssets] = true;
         _assetAmount[_countAssets] = amount;
         _assetBuyedAmount[_countAssets] = 0;
@@ -368,8 +368,7 @@ contract Crowdfund is Context {
         _assetPayoutEndTime[_countAssets] = payoutEndTime;
         _countAssets +=1;
 
-        //emit AddAsset(name, amount, minBuy, maxBuy, buyPrice, sellPrice, startTime, endTime, payoutStartTime, payoutEndTime);
-
+        return _countAssets - 1;
     }
 
     function _removeAsset(uint256 assetId) internal{

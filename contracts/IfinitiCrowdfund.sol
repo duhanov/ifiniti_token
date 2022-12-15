@@ -80,10 +80,7 @@ contract IfinitiCrowdfund is Ownable, Crowdfund {
 
     //add asset
     function addAsset(string memory name, uint256 amount, uint256 minBuy, uint256 maxBuy, uint256 buyPrice, uint256 sellPrice, uint startTime, uint endTime, uint payoutStartTime, uint payoutEndTime) public onlyOwner returns (uint256){
-        _addAsset(name, amount, minBuy, maxBuy, buyPrice, sellPrice, startTime, endTime, payoutStartTime, payoutEndTime);
-        uint256 assetId = _getCountAssets() - 1;
-
-        return assetId;
+        return _addAsset(name, amount, minBuy, maxBuy, buyPrice, sellPrice, startTime, endTime, payoutStartTime, payoutEndTime);
     }
     
     
