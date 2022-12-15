@@ -78,8 +78,8 @@ contract IfinitiCrowdfund is Ownable, Crowdfund {
     }
 
 
-    function addAsset(string memory name, uint256 minBuy, uint256 maxBuy, uint256 buyPrice, uint256 sellPrice, uint startTime, uint endTime, uint payoutStartTime, uint payoutEndTime) internal returns (uint256){
-        return _addAsset(name, minBuy, maxBuy, buyPrice, sellPrice, startTime, endTime, payoutStartTime, payoutEndTime);
+    function addAsset(string memory name, uint256 amount, uint256 minBuy, uint256 maxBuy, uint256 buyPrice, uint256 sellPrice, uint startTime, uint endTime, uint payoutStartTime, uint payoutEndTime) internal returns (uint256){
+        return _addAsset(name, amount, minBuy, maxBuy, buyPrice, sellPrice, startTime, endTime, payoutStartTime, payoutEndTime);
     }
     
     

@@ -248,6 +248,8 @@ contract Crowdfund is Context {
         require(_assetTimeEnded(assetId), "Asset time ended!");    
         //Min/Max count assets
         require(countAssets < _assetMinBuy[assetId] || countAssets > _assetMaxBuy[assetId], "invalid countAssets");
+        //check amount buyed/total
+        require(countAssets + _assetBuyedAmount[assetId] > _assetAmount[assetId], "Asset ended!");
 
         //transfer and check
         IERC20 token = IERC20(address(_erc20Token));  
@@ -325,7 +327,14 @@ contract Crowdfund is Context {
 
     //-- Assets
     uint256 private _countAssets = 0;
+    //Name
     mapping(uint256 => string) private _assetName;
+    //total amount for sell
+    mapping(uint256 => uint256) private _assetAmount;
+    //how many buyed assets
+    mapping(uint256 => uint256) private _assetBuyedAmount;
+
+    
     mapping(uint256 => bool) private _assetExist;
     mapping(uint256 => uint256) private _assetMinBuy;
     mapping(uint256 => uint256) private _assetMaxBuy;
@@ -338,8 +347,10 @@ contract Crowdfund is Context {
 
 
     //Add asset to contract
-    function _addAsset(string memory name, uint256 minBuy, uint256 maxBuy, uint256 buyPrice, uint256 sellPrice, uint startTime, uint endTime, uint payoutStartTime, uint payoutEndTime) internal returns (uint256){
+    function _addAsset(string memory name, uint256 amount, uint256 minBuy, uint256 maxBuy, uint256 buyPrice, uint256 sellPrice, uint startTime, uint endTime, uint payoutStartTime, uint payoutEndTime) internal returns (uint256){
         _assetExist[_countAssets] = true;
+        _assetAmount[_countAssets] = amount;
+        _assetBuyedAmount[_countAssets] = 0;
         _assetName[_countAssets] = name;
         _assetMinBuy[_countAssets] = minBuy;
         _assetMaxBuy[_countAssets] = maxBuy;
