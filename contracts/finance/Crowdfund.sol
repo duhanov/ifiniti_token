@@ -346,7 +346,7 @@ contract Crowdfund is Context {
     mapping(uint256 => uint) private _assetPayoutEndTime;
 
 
-//    event AddAsset(string name, uint256 amount, uint256 minBuy, uint256 maxBuy, uint256 buyPrice, uint256 sellPrice, uint startTime, uint endTime, uint payoutStartTime, uint payoutEndTime);
+    event AssetAdded(uint256 AssetId);
 
     function _getCountAssets() internal view returns (uint256){
         return _countAssets;
@@ -367,7 +367,7 @@ contract Crowdfund is Context {
         _assetPayoutStartTime[_countAssets] = payoutStartTime;
         _assetPayoutEndTime[_countAssets] = payoutEndTime;
         _countAssets +=1;
-
+        emit AssetAdded(_countAssets-1);
         return _countAssets - 1;
     }
 
