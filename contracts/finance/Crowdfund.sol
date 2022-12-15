@@ -291,8 +291,14 @@ contract Crowdfund is Context {
         return (_needCountKeys() <= _keys.length);
     }
 
+    //withdraw ERC20 tokens
+    function _withdraw(address to, uint256 amount) internal {
+        IERC20 token = IERC20(address(_erc20Token));        
+        require(token.balanceOf(address(this)) >= amount, "Balance is low");
+        token.transfer(to, amount);
 
-
+    }
+ 
 
     constructor(address erc20Token, uint256 needAmount, uint startTime, uint endTime, uint256 minBuyKeys, uint256 maxBuyKeys, uint256 keyPrice) {
 
