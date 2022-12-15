@@ -24,10 +24,6 @@ contract IfinitiCrowdfund is Ownable, Crowdfund {
 
     
 
-    //return count pushed keys
-    function getCountKeys() public view returns(uint256){
-        return _getCountKeys();
-    }
 
 
     //Push new key
@@ -77,9 +73,17 @@ contract IfinitiCrowdfund is Ownable, Crowdfund {
         return _getEnded();
     }
 
+    //get count assets
+    function getCountAssets() public view returns(uint256){
+        return _getCountAssets();
+    }
 
-    function addAsset(string memory name, uint256 amount, uint256 minBuy, uint256 maxBuy, uint256 buyPrice, uint256 sellPrice, uint startTime, uint endTime, uint payoutStartTime, uint payoutEndTime) internal returns (uint256){
-        return _addAsset(name, amount, minBuy, maxBuy, buyPrice, sellPrice, startTime, endTime, payoutStartTime, payoutEndTime);
+    //add asset
+    function addAsset(string memory name, uint256 amount, uint256 minBuy, uint256 maxBuy, uint256 buyPrice, uint256 sellPrice, uint startTime, uint endTime, uint payoutStartTime, uint payoutEndTime) public onlyOwner returns (uint256){
+        _addAsset(name, amount, minBuy, maxBuy, buyPrice, sellPrice, startTime, endTime, payoutStartTime, payoutEndTime);
+        uint256 assetId = _getCountAssets() - 1;
+
+        return assetId;
     }
     
     
