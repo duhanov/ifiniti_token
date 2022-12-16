@@ -25,21 +25,16 @@ contract IfinitiCrowdfund is Ownable, Crowdfund {
     
 
 
-
-    //Push new key
-    function pushKey(string memory key) public onlyOwner{
-        _pushKey(key);
+    //get start time
+    function getStartTime() public view returns(uint){
+        return _getStartTime();
     }
 
-    //Get Min keys four buying
-    function getBuyMinKeys() public view returns(uint256){
-        return _getBuyMinKeys();
+    //get end time
+    function getEndTime() public view returns(uint){
+        return _getEndTime();
     }
 
-    //Get Max keys four buying
-    function getMaxBuyKeys() public view returns(uint256){
-        return _getMaxBuyKeys();
-    }
 
     //order
     function order(uint256 assetId, uint256 countAssets) public returns(uint256) {

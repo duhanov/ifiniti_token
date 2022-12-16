@@ -29,11 +29,6 @@ contract Crowdfund is Context {
     uint private _endConfirmTime;
     uint private _cancelTime;
 
-   // Min keys for buy
-    uint256 private _minBuyKeys;
-
-   // Max keys for buy
-    uint256 private _maxBuyKeys;
 
     // Need Amount for end
     uint256 private _minAmount;
@@ -125,7 +120,7 @@ contract Crowdfund is Context {
 
 
     function _timeStarted() internal view returns(bool){
-        return (block.timestamp > _startTime);
+        return (block.timestamp >= _startTime);
     }
     function _assetTimeStarted(uint256 assetId) internal view returns(bool){
         return (block.timestamp >= _assetStartTime[assetId]);
@@ -304,15 +299,6 @@ contract Crowdfund is Context {
   //      return _keyPrice * countKeys;
     //}
 
-    //Get Min keys four buying
-    function _getBuyMinKeys() internal view returns(uint256){
-        return _minBuyKeys;
-    }
-
-    //Get Min keys four buying
-    function _getMaxBuyKeys() internal view returns(uint256){
-        return _maxBuyKeys;
-    }
 
 
 
