@@ -135,6 +135,12 @@ contract Crowdfund is Context {
         return (block.timestamp > _assetEndTime[assetId]);
     }
 
+    //Return orders to company and money back users
+//    function _backOrders() internal{
+  //      require(_ended, "Crowfund not ended.");
+
+    //}
+
     //Back tokens and cancel orders
     function _cancelAll() internal{
         require(!_canceled, "Already canceled.");
@@ -195,19 +201,7 @@ contract Crowdfund is Context {
         }
     }
 
-    //get order count keys
-    function _getOrderCountAssets(uint256 orderId) internal view returns(uint256){
-        //exist order
-        require(_orderExists(orderId), "Order not exist");
-        return _orderCountAssets[orderId];
-    }
 
-    //get order amount
-    function _getOrderAmount(uint256 orderId) internal view returns(uint256){
-        //exist order
-        require(_orderExists(orderId), "Order not exist");
-        return _orderAmounts[orderId];
-    }
 
     //Get open order key
 //    function _getOrderKey(uint256 orderId, uint256 keyNumber) internal view returns(string memory){
@@ -271,6 +265,32 @@ contract Crowdfund is Context {
         return _countOrders-1;
 
     }
+
+    function _getOrderOwner(uint256 orderId) internal view returns(address){
+        require(_orderExists(orderId), "Order not exist");
+        return _orderOwners[orderId];
+    }
+
+    function _getOrderAmount(uint256 orderId) internal view returns(uint256){
+        require(_orderExists(orderId), "Order not exist");
+        return _orderAmounts[orderId];
+    }
+
+    function _getOrderCountAssets(uint256 orderId) internal view returns(uint256){
+        require(_orderExists(orderId), "Order not exist");
+        return _orderCountAssets[orderId];
+    }
+
+    function _getOrderAssetId(uint256 orderId) internal view returns(uint256){
+        require(_orderExists(orderId), "Order not exist");
+        return _orderAssets[orderId];
+    }
+
+    function _getOrderTimes(uint256 orderId) internal view returns(uint256){
+        require(_orderExists(orderId), "Order not exist");
+        return _orderTimes[orderId];
+    }
+
 
     function _getErc20Token() internal view returns(address){
         return _erc20Token;

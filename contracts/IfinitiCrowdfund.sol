@@ -87,19 +87,33 @@ contract IfinitiCrowdfund is Ownable, Crowdfund {
     
     
 
-    //get  count keys in order
-    function getOrderCountAssets(uint256 orderId) public view returns(uint256){
-        return _getOrderCountAssets(orderId);
-    }
 
-    //get  count keys in order
-    function getOrderAmount(uint256 orderId) public view returns(uint256){
-        return _getOrderAmount(orderId);
-    }
 
     //withdraw
     function withdraw(address to, uint256 amount) public onlyOwner{
         _withdraw(to, amount);
     }
+
+
+    function getOrderOwner(uint256 orderId) public view returns(address){
+        return _getOrderOwner(orderId);
+    }
+
+    function getOrderAmount(uint256 orderId) public view returns(uint256){
+        return _getOrderAmount(orderId);
+    }
+
+    function getOrderCountAssets(uint256 orderId) public view returns(uint256){
+        return _getOrderCountAssets(orderId);
+    }
+
+    function getOrderAssetId(uint256 orderId) public view returns(uint256){
+        return _getOrderAssetId(orderId);
+    }
+
+    function getOrderTimes(uint256 orderId) public view returns(uint256){
+        return _getOrderTimes(orderId);
+    }
+
 
 }
