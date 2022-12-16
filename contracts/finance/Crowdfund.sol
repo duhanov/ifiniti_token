@@ -236,9 +236,9 @@ contract Crowdfund is Context {
         //check cancel
         require(!_canceled, "Crowdfund was canceled");
         //Check startTime
-        require(!_timeStarted(), "Time not started");
+        require(!_timeStarted(), "Crowdfund time not started");
         //Check endTime
-        require(_timeEnded(), "Time ended!");
+        require(_timeEnded(), "Crowdfund time ended!");
 
         //Check Asset
         //Check Asset Found
@@ -259,12 +259,13 @@ contract Crowdfund is Context {
         require(token.transferFrom(_msgSender(), address(this), orderAmount), "Cant transfer tokens");
 
         //save order info
-        _orderOwners[_countOrders] = _msgSender();
-        _orderAmounts[_countOrders] = orderAmount;
-        _orderCountAssets[_countOrders] = countAssets;
-        _orderAssets[_countOrders] = assetId;
-        _orderTimes[_countOrders] = block.timestamp;
-        _orderOpens[_countOrders] = false;
+        _assetBuyedAmount[assetId] += countAssets;//save how many buyed
+        _orderOwners[_countOrders] = _msgSender();//save who buy
+        _orderAmounts[_countOrders] = orderAmount;//save order price
+        _orderCountAssets[_countOrders] = countAssets;//save how many assets in order
+        _orderAssets[_countOrders] = assetId;//save asset_id 
+        _orderTimes[_countOrders] = block.timestamp;//save time order
+        _orderOpens[_countOrders] = false;//order not opened
         //inrease counter
         _countOrders +=1;
         return _countOrders-1;
