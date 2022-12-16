@@ -262,6 +262,7 @@ contract Crowdfund is Context {
         _orderOpens[_countOrders] = false;//order not opened
         //inrease counter
         _countOrders +=1;
+        emit OrderCreated(_countOrders - 1);
         return _countOrders-1;
 
     }
@@ -368,6 +369,7 @@ contract Crowdfund is Context {
 
 
     event AssetAdded(uint256 AssetId);
+    event OrderCreated(uint256 OrderId);
 
     function _getCountAssets() internal view returns (uint256){
         return _countAssets;
