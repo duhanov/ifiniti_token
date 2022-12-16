@@ -35,6 +35,24 @@ contract IfinitiCrowdfund is Ownable, Crowdfund {
         return _getEndTime();
     }
 
+    //get cur time
+   function getTime() public view returns(uint){
+        return _getTime();
+    }
+
+    function timeStarted() public view returns(bool){
+        return _timeStarted();
+    }
+
+
+    //get asset buyprice 
+    function getAssetBuyPrice(uint256 assetId) public view returns(uint256){
+        return _getAssetBuyPrice(assetId);
+    }
+
+    function getOrderPrice(uint256 assetId, uint256 countAssets) public view returns(uint256){
+       return _getOrderPrice(assetId, countAssets);
+    }
 
     //order
     function order(uint256 assetId, uint256 countAssets) public returns(uint256) {

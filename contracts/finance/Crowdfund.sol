@@ -118,6 +118,9 @@ contract Crowdfund is Context {
         return (block.timestamp >= _endTime);
     }
 
+    function _getTime() internal view returns(uint){
+        return block.timestamp;
+    }
 
     function _timeStarted() internal view returns(bool){
         return (block.timestamp >= _startTime);
@@ -214,31 +217,45 @@ contract Crowdfund is Context {
         return _amount >= _minAmount;
     }
     
+    function _maxAmountComplete() internal view returns(bool){
+        return _amount >= _maxAmount;
+    }
+
+    function _minAmountComplete() internal view returns(bool){
+        return _amount >= _minAmount;
+    }
+
+    function _getAssetBuyPrice(uint256 assetId) internal view returns(uint256){
+        return _assetBuyPrice[assetId];
+    }
+
+    function _getOrderPrice(uint256 assetId, uint256 countAssets) internal view returns(uint256){
+       return _assetBuyPrice[assetId] * countAssets;
+    }
+
      //order keypack
     function _order(uint256 assetId, uint256 countAssets) internal returns(uint256) {
         //check cancel
         require(!_canceled, "Crowdfund was canceled");
-        //check amount
-        require(!_amountComplete(), "Amount complete");
+        //check max amount
+        require(!_maxAmountComplete(), "Crowfund ended by Amount complete");
         //Check end
         require(!_ended, "Crowdfund ended");
-        //check cancel
-        require(!_canceled, "Crowdfund was canceled");
         //Check startTime
-        require(!_timeStarted(), "Crowdfund time not started");
+        require(_timeStarted(), "Crowdfund time not started");
         //Check endTime
-        require(_timeEnded(), "Crowdfund time ended!");
+        require(!_timeEnded(), "Crowdfund time ended!");
 
         //Check Asset
         //Check Asset Found
-        require(!_assetExist[assetId], "Asset not found");
+        require(_assetExist[assetId], "Asset not found");
         //check asset time
-        require(!_assetTimeStarted(assetId), "Asset time not started");
-        require(_assetTimeEnded(assetId), "Asset time ended!");    
+        require(_assetTimeStarted(assetId), "Asset time not started");
+        require(!_assetTimeEnded(assetId), "Asset time ended!");    
         //Min/Max count assets
-        require(countAssets < _assetMinBuy[assetId] || countAssets > _assetMaxBuy[assetId], "invalid countAssets");
+        require(countAssets >= _assetMinBuy[assetId] && countAssets <= _assetMaxBuy[assetId], "invalid countAssets");
         //check amount buyed/total
-        require(countAssets + _assetBuyedAmount[assetId] > _assetAmount[assetId], "Asset ended!");
+        require(countAssets + _assetBuyedAmount[assetId] <= _assetAmount[assetId], "Asset ended!");
 
         //transfer and check
         IERC20 token = IERC20(address(_erc20Token));  
@@ -332,6 +349,7 @@ contract Crowdfund is Context {
 
     }
  
+    mapping(address => uint256) private _countUserAssets;
 
     //-- Assets
     uint256 private _countAssets = 0;
