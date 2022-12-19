@@ -48,6 +48,9 @@ contract Crowdfund is Context {
     //Confirm of end of crowdfund
     bool private _ended = false;
 
+    //index for backOrder
+    uint256 private _backOrderIndex = 0;
+
     //crowdfund cancel?
     bool _canceled = false;
 
@@ -133,11 +136,37 @@ contract Crowdfund is Context {
         return (block.timestamp > _assetEndTime[assetId]);
     }
 
-    //Return orders to company and money back users
-//    function _backOrders() internal{
-  //      require(_ended, "Crowfund not ended.");
+    //calculate how tokens need for back
+    function _backOrderNeedTokens(uint256 count) internal view returns(uint256){
+        require(_countOrders >= _backOrderIndex + count, "Invalid _count");
+        uint256 price = 0;
 
-    //}
+        for(uint256 orderId=_backOrderIndex; orderId < _backOrderIndex + count; orderId++){
+            //order not opened
+            if(_orderOpens[orderId] == false){
+                uint256 backPrice = _assetSellPrice[_orderAssets[orderId]] * _orderCountAssets[orderId];
+                price = price + backPrice;
+            }
+        }
+        return price;
+    }
+
+//    Return orders to company and money back users
+    function _backOrders(uint256 count) internal{
+        require(_ended, "Crowfund not ended.");
+        require(_countOrders >= _backOrderIndex + count, "Invalid _count");
+        require(_balance() >= _backOrderNeedTokens(count), "Invalid Balance");
+        IERC20 token = IERC20(address(_erc20Token));        
+        //cycle by orders
+        for(uint256 orderId=_backOrderIndex; orderId < _backOrderIndex + count; orderId++){
+            //order not opened
+            if(_orderOpens[orderId] == false){
+                uint256 backPrice = _assetSellPrice[_orderAssets[orderId]] * _orderCountAssets[orderId];
+                token.transfer(_orderOwners[orderId], backPrice);
+            }
+        }
+
+    }
 
     //Back tokens and cancel orders
     function _cancelAll() internal{
@@ -346,7 +375,12 @@ contract Crowdfund is Context {
         IERC20 token = IERC20(address(_erc20Token));        
         require(token.balanceOf(address(this)) >= amount, "Balance is low");
         token.transfer(to, amount);
+    }
 
+    //balance tokens on contract
+    function _balance() internal view returns(uint256){
+        IERC20 token = IERC20(address(_erc20Token));        
+        return token.balanceOf(address(this));
     }
  
     mapping(address => uint256) private _countUserAssets;
