@@ -87,6 +87,10 @@ contract Crowdfund is Context {
   //      return _keys.length;
     //}
 
+    function getCountOrders() internal view returns(uint256){
+        return _countOrders;
+    }
+
     function _getAmount() internal view returns (uint256){
         return _amount;
     }
@@ -138,7 +142,7 @@ contract Crowdfund is Context {
 
     //calculate how tokens need for back
     function _backOrderNeedTokens(uint256 count) internal view returns(uint256){
-        require(_countOrders >= _backOrderIndex + count, "Invalid _count");
+        require(_countOrders >= _backOrderIndex + count, "Invalid count");
         uint256 price = 0;
 
         for(uint256 orderId=_backOrderIndex; orderId < _backOrderIndex + count; orderId++){
@@ -258,6 +262,10 @@ contract Crowdfund is Context {
         return _assetBuyPrice[assetId];
     }
 
+    function _getAssetSellPrice(uint256 assetId) internal view returns(uint256){
+        return _assetSellPrice[assetId];
+    }
+
     function _getOrderPrice(uint256 assetId, uint256 countAssets) internal view returns(uint256){
        return _assetBuyPrice[assetId] * countAssets;
     }
@@ -303,6 +311,8 @@ contract Crowdfund is Context {
         _orderOpens[_countOrders] = false;//order not opened
         //inrease counter
         _countOrders +=1;
+        //save total amount
+        _amount = _amount + orderAmount;
         emit OrderCreated(_countOrders - 1);
         return _countOrders-1;
 
