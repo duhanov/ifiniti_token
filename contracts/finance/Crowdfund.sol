@@ -87,7 +87,7 @@ contract Crowdfund is Context {
   //      return _keys.length;
     //}
 
-    function getCountOrders() internal view returns(uint256){
+    function _getCountOrders() internal view returns(uint256){
         return _countOrders;
     }
 

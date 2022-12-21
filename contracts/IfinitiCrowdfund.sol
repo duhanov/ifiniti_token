@@ -77,6 +77,11 @@ contract IfinitiCrowdfund is Ownable, Crowdfund {
         return _endConfirm();
     }
 
+
+    function getCountOrders() public view returns(uint256){
+        return _getCountOrders();
+    }
+
     //Open Order
     function openOrder(uint256 orderId) public{
         return _openOrder(orderId);
