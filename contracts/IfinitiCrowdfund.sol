@@ -108,6 +108,9 @@ contract IfinitiCrowdfund is Ownable, Crowdfund {
         return _balance();
     }
 
+    function getOwnerOfOrder(uint256 orderId) public view returns(address){
+        return _ownerOfOrder(orderId);
+    }
 
     //balance tokens on smartcontract
     function backOrderNeedTokens(uint256 count) public view returns(uint256){
