@@ -169,6 +169,7 @@ contract Crowdfund is Context {
                 token.transfer(_orderOwners[orderId], backPrice);
             }
         }
+        _backOrderIndex = _backOrderIndex + count;
 
     }
 
