@@ -22,7 +22,9 @@ contract IfinitiCrowdfund is Ownable, Crowdfund {
         return _getErc20Token();
     }
 
-    
+    function getAmount() public view returns (uint256){
+        return _getAmount();
+    }    
 
 
     //get start time
