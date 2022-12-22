@@ -194,14 +194,12 @@ contract Crowdfund is Context {
         return _canceled;
     }
 
-    //confirm end
+    //This method end Crowdfund if amount complete or time ended
     function _endConfirm() internal  {
         //check canceled
         require(!_canceled, "Crowdfund canceled");
-        //check Amount
-        require(_amountComplete(), "Amount not complete");
-        //check end time
-        require(_timeEnded(), "Time not ended");
+        //check end time and amount_complete
+        require(_timeEnded() || _amountComplete(), "Time not ended and Amount not complete");
         //check count keys in system
         //require(_getCountKeys() >= _needCountKeys(), "Need more keys for end");
         
@@ -245,6 +243,17 @@ contract Crowdfund is Context {
 
 //        return _keys[_orderStartKeyIndexes[orderId] + keyNumber];
   //  }
+
+
+    //min amount for end lending
+    function _getMinAmount() internal view returns(uint256){
+        return _minAmount;
+    }
+
+    //max amount for end lending
+    function _getMaxAmount() internal view returns(uint256){
+        return _maxAmount;
+    }
 
     function _amountComplete() internal view returns(bool){
         return _amount >= _minAmount;

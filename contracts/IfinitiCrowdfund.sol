@@ -22,9 +22,20 @@ contract IfinitiCrowdfund is Ownable, Crowdfund {
         return _getErc20Token();
     }
 
+    //amount tokens received by smartcontract
     function getAmount() public view returns (uint256){
         return _getAmount();
     }    
+
+    //min amount for end lending
+    function getMinAmount() public view returns(uint256){
+        return _getMinAmount();
+    }
+
+    //max amount for end lending
+    function getMaxAmount() public view returns(uint256){
+        return _getMaxAmount();
+    }
 
 
     //get start time
