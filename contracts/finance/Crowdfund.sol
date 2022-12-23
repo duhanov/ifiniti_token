@@ -167,8 +167,13 @@ contract Crowdfund is Context {
             if(_orderOpens[orderId] == false){
                 uint256 backPrice = _assetSellPrice[_orderAssets[orderId]] * _orderCountAssets[orderId];
                 token.transfer(_orderOwners[orderId], backPrice);
+                //change owner order
+                _orderOwners[orderId] = address(this);
+
             }
         }
+        
+        //Inc order index for back
         _backOrderIndex = _backOrderIndex + count;
 
     }
